@@ -1,6 +1,9 @@
 const Generator = require('yeoman-generator')
 const chalk = require('chalk')
 
+// const generateDuck = require('generateDuck')
+// const generateStoreIndex = require('generateStoreIndex')
+
 module.exports = class extends Generator {
 
   constructor (args, opts) {
@@ -64,25 +67,86 @@ module.exports = class extends Generator {
   writing() {
     const { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue } = this.props
 
-    this.fs.copy(
-      this.templatePath('createStore.js'),
-      this.destinationPath('store/createStore.js')
-    )
-    this.fs.copyTpl(
-      this.templatePath('index.js'),
-      this.destinationPath('store/index.js'),
-      { duckName }
-    )
-    this.fs.copyTpl(
-      this.templatePath('ducks/index.js'),
-      this.destinationPath('store/ducks/index.js'),
-      { duckName }
-    )
-    this.fs.copyTpl(
-      this.templatePath('ducks/duck.js'),
-      this.destinationPath(`store/ducks/${duckName}.js`),
-      { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
-    )
+    const createStoreExists = this.fs.exists('store/createStore.js')
+    const storeIndexExists = this.fs.exists('store/index.js')
+    const ducksIndexExists = this.fs.exists('store/ducks/index.js')
+
+    const duckExists = this.fs.exists(`store/ducks/${duckName}.js`)
+
+    if (!createStoreExists) {
+      this.fs.copy(
+        this.templatePath('createStore.js'),
+        this.destinationPath('store/createStore.js')
+      )
+      this.fs.copyTpl(
+        this.templatePath('index.js'),
+        this.destinationPath('store/index.js'),
+        { duckName }
+      )
+      this.fs.copyTpl(
+        this.templatePath('ducks/index.js'),
+        this.destinationPath('store/ducks/index.js'),
+        { duckName }
+      )
+      this.fs.copyTpl(
+        this.templatePath('ducks/duck.js'),
+        this.destinationPath(`store/ducks/${duckName}.js`),
+        { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+      )
+    } else {
+
+      if (!ducksIndexExists) {
+        this.fs.copyTpl(
+          this.templatePath('ducks/index.js'),
+          this.destinationPath('store/ducks/index.js'),
+          { duckName }
+        )
+      } else {
+        let indexOld = this.fs.read(this.destinationPath('store/ducks/index.js'))
+
+        this.fs.copyTpl(
+          this.templatePath('ducks/index.js'),
+          this.destinationPath('store/ducks/temp_index.js'),
+          { duckName }
+        )
+        let indexNew = this.fs.read(
+          this.destinationPath('store/ducks/temp_index.js')
+        )
+        this.fs.delete(
+          this.destinationPath('store/ducks/temp_index.js')
+        )
+        this.fs.write(
+          this.destinationPath('store/ducks/index.js'),
+          indexNew + indexOld
+        )
+      }
+
+      // read the file, copy the contents and then copy them back in?
+      // let indexOld = this.fs.read(
+      //   this.destinationPath('store/index.js')
+      // )
+      // console.log('storeIndexContent', indexOld)
+      // // now set up the contents:
+      // this.fs.copyTpl(
+      //   this.templatePath('index.js'),
+      //   this.destinationPath('store/temp_index.js'),
+      //   { duckName }
+      // )
+
+      // let indexNew = this.fs.read(
+      //   this.destinationPath('store/temp_index.js')
+      // )
+      // console.log('storeIndexContent', indexNew)
+      // // this.fs.append (
+      // //   this.destinationPath('store/index.js'),
+      // //   storeIndexContent
+      // // )
+      // this.fs.delete(
+      //   this.destinationPath('store/temp_index.js')
+      // )
+
+    }
+    
   }
 
   install() {
