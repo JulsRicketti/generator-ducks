@@ -1,7 +1,7 @@
 const Generator = require('yeoman-generator')
 const chalk = require('chalk')
 
-// const generateDuck = require('generateDuck')
+const generateDuck = require('./generateDuck')
 const generateStoreIndex = require('./generateStoreIndex')
 
 module.exports = class extends Generator {
@@ -141,6 +141,33 @@ module.exports = class extends Generator {
 
         this.fs.delete(
           this.destinationPath('store/temp_index.js')
+        )
+      }
+
+      if (duckExists){ // DONT FORGET TO NOT THIS THING!
+        this.fs.copyTpl(
+          this.templatePath('ducks/duck.js'),
+          this.destinationPath(`store/ducks/${duckName}.js`),
+          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+        )
+      } else {
+        console.log('hereee')
+        this.fs.copyTpl(
+          this.templatePath('ducks/duck.js'),
+          this.destinationPath('store/ducks/temp_duck.js'),
+          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+        )
+        let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
+        let duckOld = this.fs.read(this.destinationPath('store/ducks/Duck.js'))
+
+        generateDuck(duckOld, duckNew, this.props)
+        // this.fs.write(
+        //   this.destinationPath('store/index.js'),
+        //   generateDuck(storeIndexOld, storeIndexNew, this.props)
+        // )
+
+        this.fs.delete(
+          this.destinationPath('store/ducks/temp_duck.js')
         )
       }
     }
