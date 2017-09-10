@@ -2,7 +2,6 @@ const esprima = require('esprima')
 const escodegen = require ('escodegen')
 
 module.exports = function (oldFile, tempFile, duckName) {
-  
   const oldFileParsed = esprima.parseModule(oldFile)
   const oldFileParsedBody = oldFileParsed.body
   const tempFileParsed = esprima.parseModule(tempFile)
@@ -23,13 +22,9 @@ module.exports = function (oldFile, tempFile, duckName) {
   }
 
   // now we need to handle the last part of the file which the export of actions
-
-  // console.log('newFile:', newFile)
-
   const finalActions = esprima.tokenize(escodegen.generate(oldFileParsedBody[index]))
   const tempAction = esprima.tokenize(`{ ${duckName} },`) // this is the only part we care about
   let identifierNumber = 0 // we are looking for identifier 4
-  let newActions = []
 
   finalActions.forEach((action, index) => {
     identifierNumber += action.type === 'Identifier' ? 1 : 0
@@ -59,6 +54,5 @@ module.exports = function (oldFile, tempFile, duckName) {
       generatedFile = generatedFile + value + ' '
     }
   })
-  console.log('newFileString', generatedFile)
   return generatedFile
 }
