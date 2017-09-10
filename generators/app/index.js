@@ -79,6 +79,11 @@ module.exports = class extends Generator {
         this.destinationPath('store/createStore.js')
       )
       this.fs.copyTpl(
+        this.templatePath('index.js'),
+        this.destinationPath('store/index.js'),
+        { duckName }
+      )
+      this.fs.copyTpl(
         this.templatePath('ducks/index.js'),
         this.destinationPath('store/ducks/index.js'),
         { duckName }
