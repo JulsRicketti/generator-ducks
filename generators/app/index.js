@@ -2,7 +2,7 @@ const Generator = require('yeoman-generator')
 const chalk = require('chalk')
 
 // const generateDuck = require('generateDuck')
-// const generateStoreIndex = require('generateStoreIndex')
+const generateStoreIndex = require('./generateStoreIndex')
 
 module.exports = class extends Generator {
 
@@ -79,11 +79,6 @@ module.exports = class extends Generator {
         this.destinationPath('store/createStore.js')
       )
       this.fs.copyTpl(
-        this.templatePath('index.js'),
-        this.destinationPath('store/index.js'),
-        { duckName }
-      )
-      this.fs.copyTpl(
         this.templatePath('ducks/index.js'),
         this.destinationPath('store/ducks/index.js'),
         { duckName }
@@ -94,7 +89,6 @@ module.exports = class extends Generator {
         { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
       )
     } else {
-
       if (!ducksIndexExists) {
         this.fs.copyTpl(
           this.templatePath('ducks/index.js'),
@@ -120,31 +114,30 @@ module.exports = class extends Generator {
           indexNew + indexOld
         )
       }
+      if (!storeIndexExists) {
+        this.fs.copyTpl(
+          this.templatePath('index.js'),
+          this.destinationPath('store/index.js'),
+          { duckName }
+        )
+      } else {
+        this.fs.copyTpl(
+          this.templatePath('index.js'),
+          this.destinationPath('store/temp_index.js'),
+          { duckName }
+        )
+        let storeIndexNew = this.fs.read(this.destinationPath('store/temp_index.js'))
+        let storeIndexOld = this.fs.read(this.destinationPath('store/index.js'))
 
-      // read the file, copy the contents and then copy them back in?
-      // let indexOld = this.fs.read(
-      //   this.destinationPath('store/index.js')
-      // )
-      // console.log('storeIndexContent', indexOld)
-      // // now set up the contents:
-      // this.fs.copyTpl(
-      //   this.templatePath('index.js'),
-      //   this.destinationPath('store/temp_index.js'),
-      //   { duckName }
-      // )
+        this.fs.write(
+          this.destinationPath('store/index.js'),
+          generateStoreIndex(storeIndexOld, storeIndexNew, duckName)
+        )
 
-      // let indexNew = this.fs.read(
-      //   this.destinationPath('store/temp_index.js')
-      // )
-      // console.log('storeIndexContent', indexNew)
-      // // this.fs.append (
-      // //   this.destinationPath('store/index.js'),
-      // //   storeIndexContent
-      // // )
-      // this.fs.delete(
-      //   this.destinationPath('store/temp_index.js')
-      // )
-
+        this.fs.delete(
+          this.destinationPath('store/temp_index.js')
+        )
+      }
     }
     
   }
