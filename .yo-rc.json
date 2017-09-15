@@ -5,5 +5,11 @@
       "authorEmail": "julsricketti@gmail.com",
       "authorUrl": ""
     }
+  },
+  "generator-contcomp": {
+    "promptValues": {
+      "destinationPath": "./",
+      "jsSystem": "TypeScript"
+    }
   }
 }
