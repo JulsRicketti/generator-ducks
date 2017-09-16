@@ -91,7 +91,7 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         this.templatePath('ducks/duck.js'),
         this.destinationPath(`store/ducks/${duckName}.js`),
-        { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+        { duckName, actionName: actionName.toUpperCase(), actionCreatorName, defaultStateName, defaultStateValue }
       )
     } else {
       if (!ducksIndexExists) {
@@ -114,10 +114,10 @@ module.exports = class extends Generator {
         this.fs.delete(
           this.destinationPath('store/ducks/temp_index.js')
         )
-        this.fs.write(
-          this.destinationPath('store/ducks/index.js'),
-          indexNew + indexOld
-        )
+        // this.fs.write(
+        //   this.destinationPath('store/ducks/index.js'),
+        //   indexNew + indexOld
+        // )
       }
       if (!storeIndexExists) {
         this.fs.copyTpl(
@@ -134,41 +134,40 @@ module.exports = class extends Generator {
         let storeIndexNew = this.fs.read(this.destinationPath('store/temp_index.js'))
         let storeIndexOld = this.fs.read(this.destinationPath('store/index.js'))
 
-        this.fs.write(
-          this.destinationPath('store/index.js'),
-          generateStoreIndex(storeIndexOld, storeIndexNew, duckName)
-        )
+        // this.fs.write(
+        //   this.destinationPath('store/index.js'),
+        //   generateStoreIndex(storeIndexOld, storeIndexNew, duckName)
+        // )
 
         this.fs.delete(
           this.destinationPath('store/temp_index.js')
         )
       }
 
-      if (duckExists){ // DONT FORGET TO NOT THIS THING!
+      if (!duckExists){ // DONT FORGET TO NOT THIS THING!
         this.fs.copyTpl(
           this.templatePath('ducks/duck.js'),
           this.destinationPath(`store/ducks/${duckName}.js`),
           { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
         )
       } else {
-        // TODO: muh duck re-writer/generator here!
-        // this.fs.copyTpl(
-        //   this.templatePath('ducks/duck.js'),
-        //   this.destinationPath('store/ducks/temp_duck.js'),
-        //   { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
-        // )
-        // let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
-        // let duckOld = this.fs.read(this.destinationPath(`store/duck/${duckName}.js`))
+        this.fs.copyTpl(
+          this.templatePath('ducks/duck.js'),
+          this.destinationPath('store/ducks/temp_duck.js'),
+          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+        )
+        let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
+        let duckOld = this.fs.read(this.destinationPath(`store/ducks/${duckName}.js`))
 
-        // generateDuck(duckOld, duckNew, this.props)
-        // // this.fs.write(
-        // //   this.destinationPath('store/index.js'),
-        // //   generateDuck(storeIndexOld, storeIndexNew, this.props)
-        // // )
-
-        // this.fs.delete(
-        //   this.destinationPath('store/ducks/temp_duck.js')
+        generateDuck(duckOld, duckNew, this.props)
+        // this.fs.write(
+        //   this.destinationPath('store/index.js'),
+        //   generateDuck(storeIndexOld, storeIndexNew, this.props)
         // )
+
+        this.fs.delete(
+          this.destinationPath('store/ducks/temp_duck.js')
+        )
       }
     }
     
