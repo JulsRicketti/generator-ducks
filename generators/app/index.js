@@ -1,5 +1,6 @@
 const Generator = require('yeoman-generator')
 const chalk = require('chalk')
+const fs = require('fs')
 
 const generateDuck = require('./generateDuck')
 const generateStoreIndex = require('./generateStoreIndex')
@@ -31,7 +32,27 @@ module.exports = class extends Generator {
      * - If default, select from the list of ducks, to chose which one it will be generated in
      * and ask for both action and reducer names, generate that in the chosen duck.
      */
-    const prompts = [{
+    let ducks = []
+    const hatch = this.options['hatch']
+    fs.readdirSync('./store/ducks').forEach(file => {
+      if (file !== 'index.js') {
+        ducks.push(file)
+      }
+    })
+
+    const prompts = [ {
+      when: function () {
+        return ducks.length && !hatch
+      },
+      type: 'list',
+      name: 'duckChoice',
+      message: 'Which of these ducks would you like?',
+      choices: ducks,
+    },
+    {
+      when: function (response) {
+        return hatch || response.duckChoice === 'Create new duck'
+      },
       type: 'input',
       name: 'duckName',
       message: 'What is the name of your duck?'
