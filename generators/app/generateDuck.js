@@ -16,7 +16,6 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   for (let statement of oldFileParsedBody){
     // goes up until we reach the default state
     if (statement.declarations[0].id.name === 'defaultState') {
-      console.log('hellooo')
       defaultState = statement
       break
     }

@@ -1,7 +1,7 @@
 const <%= actionName %> = '<%= duckName %>/<%= actionName %>'
 
 const defaultState = {
-  <%= defaultStateName %>: <%= defaultStateValue %>
+  <%= defaultStateName %>: <% if (addQuotesToStateValue) {%>'<% } %><%= defaultStateValue %><% if (addQuotesToStateValue) {%>'<% } %>
 }
 
 export default function reducer (state = defaultState, action = {}) {

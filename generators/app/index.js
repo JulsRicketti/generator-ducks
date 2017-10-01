@@ -86,7 +86,21 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    const { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue } = this.props
+    const { duckName, actionCreatorName, defaultStateName } = this.props
+    let { defaultStateValue, actionName } = this.props
+    actionName = actionName.toUpperCase()
+    // we need to fix tha state value to be a string if it isnt a reserved
+    // word or a number and if the user didnt include quotes:
+    let addQuotesToStateValue = (
+      defaultStateValue !== 'undefined' &&
+      defaultStateValue !== 'null' && 
+      !Number(defaultStateValue)
+    )
+    // remove the quotes if the user inserts them in
+    if(defaultStateValue.indexOf('\'') !== -1 || defaultStateValue.indexOf('"') !== -1 ) {
+      defaultStateValue = defaultStateValue.substring(1, defaultStateValue.length-1)
+    }
+
 
     const createStoreExists = this.fs.exists('store/createStore.js')
     const storeIndexExists = this.fs.exists('store/index.js')
@@ -112,7 +126,14 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         this.templatePath('ducks/duck.js'),
         this.destinationPath(`store/ducks/${duckName}.js`),
-        { duckName, actionName: actionName.toUpperCase(), actionCreatorName, defaultStateName, defaultStateValue }
+        {
+          duckName,
+          actionName,
+          actionCreatorName,
+          defaultStateName,
+          defaultStateValue,
+          addQuotesToStateValue
+        }
       )
     } else {
       if (!ducksIndexExists) {
@@ -169,13 +190,13 @@ module.exports = class extends Generator {
         this.fs.copyTpl(
           this.templatePath('ducks/duck.js'),
           this.destinationPath(`store/ducks/${duckName}.js`),
-          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue, addQuotesToStateValue }
         )
       } else {
         this.fs.copyTpl(
           this.templatePath('ducks/duck.js'),
           this.destinationPath('store/ducks/temp_duck.js'),
-          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue }
+          { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue, addQuotesToStateValue }
         )
         let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
         let duckOld = this.fs.read(this.destinationPath(`store/ducks/${duckName}.js`))
