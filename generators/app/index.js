@@ -32,17 +32,19 @@ module.exports = class extends Generator {
      * - If default, select from the list of ducks, to chose which one it will be generated in
      * and ask for both action and reducer names, generate that in the chosen duck.
      */
-    let ducks = []
+    let ducks = ['Create new duck']
     const hatch = this.options['hatch']
-    fs.readdirSync('./store/ducks').forEach(file => {
-      if (file !== 'index.js') {
-        ducks.push(file)
-      }
-    })
+    if (fs.exists('./store/ducks')) {
+      fs.readdirSync('./store/ducks').forEach(file => {
+        if (file !== 'index.js') {
+          ducks.push(file)
+        }
+      })
+    }
 
     const prompts = [ {
       when: function () {
-        return ducks.length && !hatch
+        return ducks.length > 1 && !hatch
       },
       type: 'list',
       name: 'duckChoice',
@@ -51,7 +53,11 @@ module.exports = class extends Generator {
     },
     {
       when: function (response) {
-        return hatch || response.duckChoice === 'Create new duck'
+        return (
+          ducks.length === 1 || // if it 1 as opposed to 0 due to the Create option
+          hatch ||
+          response.duckChoice === 'Create new duck'
+        )
       },
       type: 'input',
       name: 'duckName',
