@@ -25,7 +25,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   // push our new action statement
   newFile.push(tempFileParsedBody[0])
 
-  // now lets do our redux state:
+  // now lets do our default redux state:
   const oldFileStateObject = oldFileParsedBody[index].declarations[0].init.properties
   let oldFileStateTokenized = esprima.tokenize(escodegen.generate(oldFileParsedBody[index]))
 
@@ -46,20 +46,41 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   oldFileStateTokenized.forEach (token => {
     const { type, value } = token
 
+    // Note: the appropriate identation will have to be done later!
     if (type === 'Keyword' || value === 'defaultState' || value === '=') {
       newDefaultState = newDefaultState + value + ' '
-    } else if (value === '{' || value === ',' || value === defaultStateValue) {
-      newDefaultState = newDefaultState + value + '\n'
     } else {
       newDefaultState = newDefaultState + value
     }
   })
-  console.log('newDefaultState:', newDefaultState)
+  // console.log('newDefaultState:', newDefaultState)
   newFile.push (newDefaultState)
   index ++
-  // next: the reducer!
-  // const oldFileReducer = oldFileParsedBody[index].declarations[0].init.properties
-  // console.log('old file reducer:', oldFileReducer)
 
-  // console.log(index, 'newFile:', escodegen.generate(newFile[newFile.length - 1]))
+  // next: the reducer!
+  const oldFileReducer = oldFileParsedBody[index]
+  let oldFileReducerTokenized = esprima.tokenize(escodegen.generate(oldFileReducer))
+  let newReducer = ''
+  const newCase = `case ${actionName}: return Object.assign({}, state, { ${defaultStateName}: action.${defaultStateName} })`
+  oldFileReducerTokenized.splice(oldFileStateTokenized.indexOf('default') - 1, 0, { type: 'New Statement', value: newCase })
+  // oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('default') - 1, 0, { type: 'Punctuator', value: ',' })
+  // oldFileReducer.splice(oldFileReducer.indexOf('default') - 1, 0,{ type: 'Identifier', value: defaultStateName })
+  // oldFileReducer.splice(oldFileReducer.indexOf('default') - 1, 0, { type: 'Punctuator', value: ':' })
+  // this has to be done because we need to appropriately represent the string value
+  console.log('old file reducer: (AFTER)', oldFileReducerTokenized )
+  oldFileReducerTokenized.forEach (token => {
+    const { type, value } = token
+
+    // Note: the appropriate identation will have to be done later!
+    if (type === 'Keyword' || value === 'reducer' || value === '=') {
+      newReducer = newReducer + value + ' '
+    } else {
+      newReducer = newReducer + value
+    }
+  })
+  console.log('new reducer:', newReducer)
+
+
+  // console.log(index, 'newFile:', newFile[newFile.length - 1])
+
 }
