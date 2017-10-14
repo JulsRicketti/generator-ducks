@@ -22,20 +22,10 @@ module.exports = class extends Generator {
   }
 
   prompting() {
-
-    /**
-     * TODO:
-     * if we don't have a store with the boilerplate files, we do the initial setup.
-     * Look into the folder, see which ducks are available and list them
-     * 
-     * - hatch === true: just ask for ducks name, followed by the actions and reducer
-     * - If default, select from the list of ducks, to chose which one it will be generated in
-     * and ask for both action and reducer names, generate that in the chosen duck.
-     */
     let ducks = ['Create new duck']
     const hatch = this.options['hatch']
-    if (fs.exists('./store/ducks')) {
-      fs.readdirSync('./store/ducks').forEach(file => {
+    if (this.fs.exists('./store/ducks/index.js')) {
+      fs.readdirSync('store/ducks').forEach(file => {
         if (file !== 'index.js') {
           ducks.push(file)
         }
@@ -47,7 +37,7 @@ module.exports = class extends Generator {
         return ducks.length > 1 && !hatch
       },
       type: 'list',
-      name: 'duckChoice',
+      name: 'duckName',
       message: 'Which of these ducks would you like?',
       choices: ducks,
     },
@@ -56,7 +46,7 @@ module.exports = class extends Generator {
         return (
           ducks.length === 1 || // if it 1 as opposed to 0 due to the Create option
           hatch ||
-          response.duckChoice === 'Create new duck'
+          response.duckName === 'Create new duck'
         )
       },
       type: 'input',
@@ -92,9 +82,10 @@ module.exports = class extends Generator {
   }
 
   writing() {
-    const { duckName, actionCreatorName, defaultStateName } = this.props
-    let { defaultStateValue, actionName } = this.props
+    const { actionCreatorName, defaultStateName } = this.props
+    let { duckName, defaultStateValue, actionName } = this.props
     actionName = actionName.toUpperCase()
+
     // we need to fix tha state value to be a string if it isnt a reserved
     // word or a number and if the user didnt include quotes:
     let addQuotesToStateValue = (
@@ -107,6 +98,11 @@ module.exports = class extends Generator {
       defaultStateValue = defaultStateValue.substring(1, defaultStateValue.length-1)
     }
 
+    // we need to remove the .js that may appear in the duckName:
+    if(duckName.indexOf('.js')){
+      duckName = duckName.replace('.js', '')
+    }
+    console.log('duckName:', duckName)
 
     const createStoreExists = this.fs.exists('store/createStore.js')
     const storeIndexExists = this.fs.exists('store/index.js')
