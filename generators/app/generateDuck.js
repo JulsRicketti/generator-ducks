@@ -90,7 +90,18 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   generatedFileContents.forEach(statement => {
     generatedFile = generatedFile + statement + '\n'
   })
-  console.log('generatedFile:', generatedFile)
+  
+  const escodegenOptions = {
+      format: {
+        indent: {
+          style: '  ',
+          base: 0,
+          adjustMultilineComment: false
+      },
+      semicolons: false
+    }
+  }
+  generatedFile = escodegen.generate(esprima.parseModule(generatedFile), escodegenOptions)
   return generatedFile
 
 }

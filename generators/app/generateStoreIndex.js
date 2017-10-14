@@ -54,5 +54,10 @@ module.exports = function (oldFile, tempFile, duckName) {
       generatedFile = generatedFile + value + ' '
     }
   })
+
+  const escodegenOptions = {
+    semicolons: false
+  }
+  generatedFile = escodegen.generate(esprima.parseModule(generatedFile), escodegenOptions)
   return generatedFile
 }
