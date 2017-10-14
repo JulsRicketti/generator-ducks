@@ -203,11 +203,12 @@ module.exports = class extends Generator {
         let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
         let duckOld = this.fs.read(this.destinationPath(`store/ducks/${duckName}.js`))
 
-        generateDuck(duckOld, duckNew, this.props)
-        // this.fs.write(
-        //   this.destinationPath('store/index.js'),
-        //   generateDuck(storeIndexOld, storeIndexNew, this.props)
-        // )
+        // generateDuck(duckOld, duckNew, this.props)
+        // TODO: not working! Fix the writing of this file!
+        this.fs.write(
+          this.destinationPath(`store/ducks/${duckName}.js`),
+          generateDuck(duckOld, duckNew, this.props)
+        )
 
         this.fs.delete(
           this.destinationPath('store/ducks/temp_duck.js')

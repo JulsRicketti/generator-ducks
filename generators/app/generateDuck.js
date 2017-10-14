@@ -8,7 +8,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   const tempFileParsed = esprima.parseModule(tempFile)
   const tempFileParsedBody = tempFileParsed.body
 
-  let generatedFile = []
+  let generatedFileContents = []
   let index = 0
 
   let defaultState = null
@@ -19,11 +19,11 @@ module.exports = function (oldFile, tempFile, duckProperties) {
       defaultState = statement
       break
     }
-    generatedFile.push(statement)
+    generatedFileContents.push(escodegen.generate(statement))
     index ++ // to keep track of where we are in the old file
   }
   // push our new action statement
-  generatedFile.push(tempFileParsedBody[0])
+  generatedFileContents.push(escodegen.generate(tempFileParsedBody[0]))
 
   // now lets do our default redux state:
   const oldFileStateObject = oldFileParsedBody[index].declarations[0].init.properties
@@ -54,7 +54,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
     }
   })
   // console.log('newDefaultState:', newDefaultState)
-  generatedFile.push (newDefaultState)
+  generatedFileContents.push (newDefaultState)
   index ++
 
   // next: the reducer!
@@ -74,17 +74,23 @@ module.exports = function (oldFile, tempFile, duckProperties) {
       newReducer = newReducer + value
     }
   })
-  generatedFile.push(newReducer)
+  generatedFileContents.push(newReducer)
 
   // finally our actionCreator
   // this we can just get from our generated files (old and new!)
   oldFileParsedBody.forEach(declaration => {
     if (declaration.type === 'ExportNamedDeclaration'){
-        generatedFile.push (escodegen.generate(declaration))
+        generatedFileContents.push (escodegen.generate(declaration))
     }
   })
-  generatedFile.push(escodegen.generate(tempFileParsedBody[tempFileParsedBody.length - 1]))
-
-  console.log(index, 'newFile:', generatedFile)
+  generatedFileContents.push(escodegen.generate(tempFileParsedBody[tempFileParsedBody.length - 1]))
+  
+  // generated file needs to be a single string to make this work:
+  let generatedFile = ''
+  generatedFileContents.forEach(statement => {
+    generatedFile = generatedFile + statement + '\n'
+  })
+  console.log('generatedFile:', generatedFile)
+  return generatedFile
 
 }
