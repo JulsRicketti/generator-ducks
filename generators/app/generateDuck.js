@@ -8,7 +8,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   const tempFileParsed = esprima.parseModule(tempFile)
   const tempFileParsedBody = tempFileParsed.body
 
-  let newFile = []
+  let generatedFile = []
   let index = 0
 
   let defaultState = null
@@ -19,11 +19,11 @@ module.exports = function (oldFile, tempFile, duckProperties) {
       defaultState = statement
       break
     }
-    newFile.push(statement)
+    generatedFile.push(statement)
     index ++ // to keep track of where we are in the old file
   }
   // push our new action statement
-  newFile.push(tempFileParsedBody[0])
+  generatedFile.push(tempFileParsedBody[0])
 
   // now lets do our default redux state:
   const oldFileStateObject = oldFileParsedBody[index].declarations[0].init.properties
@@ -54,7 +54,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
     }
   })
   // console.log('newDefaultState:', newDefaultState)
-  newFile.push (newDefaultState)
+  generatedFile.push (newDefaultState)
   index ++
 
   // next: the reducer!
@@ -63,11 +63,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   let newReducer = ''
   const newCase = `case ${actionName}: return Object.assign({}, state, { ${defaultStateName}: action.${defaultStateName} })`
   oldFileReducerTokenized.splice(oldFileStateTokenized.indexOf('default') - 1, 0, { type: 'New Statement', value: newCase })
-  // oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('default') - 1, 0, { type: 'Punctuator', value: ',' })
-  // oldFileReducer.splice(oldFileReducer.indexOf('default') - 1, 0,{ type: 'Identifier', value: defaultStateName })
-  // oldFileReducer.splice(oldFileReducer.indexOf('default') - 1, 0, { type: 'Punctuator', value: ':' })
-  // this has to be done because we need to appropriately represent the string value
-  console.log('old file reducer: (AFTER)', oldFileReducerTokenized )
+  // console.log('old file reducer: (AFTER)', oldFileReducerTokenized )
   oldFileReducerTokenized.forEach (token => {
     const { type, value } = token
 
@@ -78,9 +74,17 @@ module.exports = function (oldFile, tempFile, duckProperties) {
       newReducer = newReducer + value
     }
   })
-  console.log('new reducer:', newReducer)
+  generatedFile.push(newReducer)
 
+  // finally our actionCreator
+  // this we can just get from our generated files (old and new!)
+  oldFileParsedBody.forEach(declaration => {
+    if (declaration.type === 'ExportNamedDeclaration'){
+        generatedFile.push (escodegen.generate(declaration))
+    }
+  })
+  generatedFile.push(escodegen.generate(tempFileParsedBody[tempFileParsedBody.length - 1]))
 
-  // console.log(index, 'newFile:', newFile[newFile.length - 1])
+  console.log(index, 'newFile:', generatedFile)
 
 }
