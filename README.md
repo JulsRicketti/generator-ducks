@@ -55,11 +55,10 @@ If you would like to skip the creation of any of the previously listed Redux thi
 
 For the default state values, we currently support strings, numbers, arrays, objects and all relevant JavaScript keywords (I wouldn't bet my life on that last one, so in case I missed any, do not hesitate to let me know).
 
-```
-Important Note:
+### Important Note:
 
 Avoid changing the file structure. Due to the nature of this generator of editing previously existing files, major changes in the order of things will affect the ability to later generate more code on that same file. When you do need to add your own code, make sure to keep it all within the generated functions and objects.
-```
+
 
 ## Getting To Know Yeoman
 
