@@ -82,6 +82,13 @@ module.exports = class extends Generator {
   }
 
   writing() {
+    const escodegenOptions = {
+      format: {
+        quotes: 'single',
+        semicolons: false
+      }
+    }
+
     const { actionCreatorName, defaultStateName } = this.props
     let { duckName, defaultStateValue, actionName } = this.props
     actionName = actionName.toUpperCase()
@@ -91,6 +98,10 @@ module.exports = class extends Generator {
     let addQuotesToStateValue = (
       defaultStateValue !== 'undefined' &&
       defaultStateValue !== 'null' && 
+      defaultStateValue !== '[]' && 
+      defaultStateValue !== '{}' && 
+      defaultStateValue !== 'true' && 
+      defaultStateValue !== 'false' && 
       !Number(defaultStateValue)
     )
     // remove the quotes if the user inserts them in
@@ -144,7 +155,7 @@ module.exports = class extends Generator {
           this.destinationPath('store/ducks/index.js'),
           { duckName }
         )
-      } else {
+      } else if(!duckExists) {
         let indexOld = this.fs.read(this.destinationPath('store/ducks/index.js'))
 
         this.fs.copyTpl(
@@ -158,10 +169,10 @@ module.exports = class extends Generator {
         this.fs.delete(
           this.destinationPath('store/ducks/temp_index.js')
         )
-        // this.fs.write(
-        //   this.destinationPath('store/ducks/index.js'),
-        //   indexNew + indexOld
-        // )
+        this.fs.write(
+          this.destinationPath('store/ducks/index.js'),
+          indexNew + indexOld
+        )
       }
       if (!storeIndexExists) {
         this.fs.copyTpl(
@@ -169,7 +180,7 @@ module.exports = class extends Generator {
           this.destinationPath('store/index.js'),
           { duckName }
         )
-      } else {
+      } else if (!duckExists) {
         this.fs.copyTpl(
           this.templatePath('index.js'),
           this.destinationPath('store/temp_index.js'),
@@ -178,17 +189,16 @@ module.exports = class extends Generator {
         let storeIndexNew = this.fs.read(this.destinationPath('store/temp_index.js'))
         let storeIndexOld = this.fs.read(this.destinationPath('store/index.js'))
 
-        // this.fs.write(
-        //   this.destinationPath('store/index.js'),
-        //   generateStoreIndex(storeIndexOld, storeIndexNew, duckName)
-        // )
+        this.fs.write(
+          this.destinationPath('store/index.js'),
+          generateStoreIndex(storeIndexOld, storeIndexNew, duckName)
+        )
 
         this.fs.delete(
           this.destinationPath('store/temp_index.js')
         )
       }
-
-      if (!duckExists){ // DONT FORGET TO NOT THIS THING!
+      if (!duckExists){
         this.fs.copyTpl(
           this.templatePath('ducks/duck.js'),
           this.destinationPath(`store/ducks/${duckName}.js`),
@@ -203,8 +213,6 @@ module.exports = class extends Generator {
         let duckNew = this.fs.read(this.destinationPath('store/ducks/temp_duck.js'))
         let duckOld = this.fs.read(this.destinationPath(`store/ducks/${duckName}.js`))
 
-        // generateDuck(duckOld, duckNew, this.props)
-        // TODO: not working! Fix the writing of this file!
         this.fs.write(
           this.destinationPath(`store/ducks/${duckName}.js`),
           generateDuck(duckOld, duckNew, this.props)
