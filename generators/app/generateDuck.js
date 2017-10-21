@@ -102,6 +102,6 @@ module.exports = function (oldFile, tempFile, duckProperties) {
     }
   }
   generatedFile = escodegen.generate(esprima.parseModule(generatedFile), escodegenOptions)
-  return generatedFile
+  return generatedFile.replace(/;/g, '')
 
 }
