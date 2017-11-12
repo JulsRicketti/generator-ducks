@@ -2,7 +2,7 @@ const esprima = require('esprima')
 const escodegen = require ('escodegen')
 
 module.exports = function (oldFile, tempFile, duckProperties) {
-  let { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue } = duckProperties
+  let { duckName, actionName, actionCreatorName, defaultStateName, defaultStateValue, addQuotesToStateValue } = duckProperties
   const oldFileParsed = esprima.parseModule(oldFile)
   const oldFileParsedBody = oldFileParsed.body
   const tempFileParsed = esprima.parseModule(tempFile)
@@ -32,15 +32,33 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0, { type: 'Punctuator', value: ',' })
   oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0,{ type: 'Identifier', value: defaultStateName })
   oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0, { type: 'Punctuator', value: ':' })
+  
   // this has to be done because we need to appropriately represent the string value
-  if (typeof defaultStateValue === 'string') {
+  if (addQuotesToStateValue) {
     defaultStateValue = ` \'${defaultStateValue}\'`
     oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0,  { type: 'String', value: defaultStateValue })
   } else {
-    oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0,  { type: typeof defaultStateValue, value: defaultStateValue })
+    const defaultStateValueType = 'object'
+    switch (defaultStateValue) {
+      case 'null':
+      case '[]':
+      case '{}':
+        type = 'object'
+        break
+      case 'undefined':
+        type = 'undefined'
+        break
+      case 'true':
+      case 'false':
+        type = 'boolean'
+        break
+      default:
+        type = 'number' 
+    }
+
+    oldFileStateTokenized.splice(oldFileStateTokenized.indexOf('}') - 1, 0,  { type: defaultStateValueType, value: defaultStateValue })
   }
 
-  // console.log('AFTER', oldFileStateTokenized)
   let newDefaultState = ''
 
   oldFileStateTokenized.forEach (token => {
@@ -53,7 +71,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
       newDefaultState = newDefaultState + value
     }
   })
-  // console.log('newDefaultState:', newDefaultState)
+
   generatedFileContents.push (newDefaultState)
   index ++
 
@@ -63,7 +81,7 @@ module.exports = function (oldFile, tempFile, duckProperties) {
   let newReducer = ''
   const newCase = `case ${actionName}: return Object.assign({}, state, { ${defaultStateName}: action.${defaultStateName} })`
   oldFileReducerTokenized.splice(oldFileStateTokenized.indexOf('default') - 1, 0, { type: 'New Statement', value: newCase })
-  // console.log('old file reducer: (AFTER)', oldFileReducerTokenized )
+
   oldFileReducerTokenized.forEach (token => {
     const { type, value } = token
 

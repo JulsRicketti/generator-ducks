@@ -113,7 +113,6 @@ module.exports = class extends Generator {
     if(duckName.indexOf('.js')){
       duckName = duckName.replace('.js', '')
     }
-    console.log('duckName:', duckName)
 
     const createStoreExists = this.fs.exists('store/createStore.js')
     const storeIndexExists = this.fs.exists('store/index.js')
