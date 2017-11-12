@@ -49,11 +49,7 @@ The prompt will ask you all the questions it needs to know:
 
 Unfortunately when editing a previously existing file, in other words, starting from the second time you run this in your app, their will be a prompt asking you if you would like to proceed with doing so.
 
-If you would like to skip the creation of any of the previously listed Redux thingies, just leave them blank and node new code for them will be generated.
-
-`Example: if you don't want a new default state, just leave it blank when it's prompt appears.`
-
-For the default state values, we currently support strings, numbers, arrays, objects and all relevant JavaScript keywords (I wouldn't bet my life on that last one, so in case I missed any, do not hesitate to let me know).
+For the default state values, we currently support strings, numbers, empty arrays and objects and all relevant JavaScript keywords (I wouldn't bet my life on that last one, so in case I missed any, do not hesitate to let me know).
 
 ### Important Note:
 
