@@ -1,4 +1,4 @@
-# generator-ducks [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][daviddm-image]][daviddm-url] [![Coverage percentage][coveralls-image]][coveralls-url]
+# generator-ducks [![NPM version][npm-image]][npm-url]
 > A simple generator for Ducks, the Redux Reducer Bundles
 
 ## Installation
