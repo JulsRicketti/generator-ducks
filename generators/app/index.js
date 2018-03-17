@@ -222,14 +222,14 @@ module.exports = class extends Generator {
         )
       }
     }
-    
   }
 
   install() {
     const installDependencies = this.options['install-dependencies']
 
-    if(installDependencies) {
-      this.installDependencies()
+    if (installDependencies) {
+      this.npmInstall(['redux'], { save: true })
+      this.npmInstall(['react-router-redux'], { save: true })
     }
   }
 }
