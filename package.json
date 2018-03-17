@@ -1,6 +1,6 @@
 {
   "name": "generator-ducks",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A simple generator for Ducks, the Redux Reducer Bundles",
   "homepage": "",
   "author": {
@@ -34,8 +34,6 @@
   "dependencies": {
     "escodegen": "^1.9.0",
     "esprima": "^4.0.0",
-    "react-router-redux": "^4.0.8",
-    "redux": "^3.7.2",
     "yeoman-generator": "^1.1.1"
   },
   "jest": {
