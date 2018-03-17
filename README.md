@@ -15,6 +15,12 @@ Then generate your new project:
 ```bash
 yo ducks
 ```
+
+`Note: Upon the first run, if you don't have your related redux packages installed, we can take care of that for you. Simply run:`
+
+```bash
+yo ducks --install-dependencies
+```
 ## What is Ducks?
 
 Ducks is an alternative way to bundle reducers, action types and actions when using Redux.
@@ -55,7 +61,6 @@ For the default state values, we currently support strings, numbers, empty array
 
 Avoid changing the file structure. Due to the nature of this generator of editing previously existing files, major changes in the order of things will affect the ability to later generate more code on that same file. When you do need to add your own code, make sure to keep it all within the generated functions and objects.
 
-
 ## Getting To Know Yeoman
 
  * Yeoman has a heart of gold.
@@ -65,8 +70,7 @@ Avoid changing the file structure. Due to the nature of this generator of editin
 
 ## License
 
-MIT © [JulsRicketti]()
-
+MIT © [JulsRicketti](https://github.com/julsricketti)
 
 [npm-image]: https://badge.fury.io/js/generator-ducks.svg
 [npm-url]: https://npmjs.org/package/generator-ducks
