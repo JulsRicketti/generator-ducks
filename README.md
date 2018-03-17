@@ -73,11 +73,17 @@ Avoid changing the file structure. Due to the nature of this generator of editin
 MIT © [JulsRicketti](https://github.com/julsricketti)
 
 [npm-image]: https://badge.fury.io/js/generator-ducks.svg
+
 [npm-url]: https://npmjs.org/package/generator-ducks
-[travis-image]: https:/
-/travis-ci.org/JulsRicketti/generator-ducks.svg?branch=master
+
+[travis-image]: https://travis-ci.org/JulsRicketti/generator-ducks.svg?branch=master
 [travis-url]: https://travis-ci.org/JulsRicketti/generator-ducks
+
 [daviddm-image]: https://david-dm.org/JulsRicketti/generator-ducks.svg?theme=shields.io
+
 [daviddm-url]: https://david-dm.org/JulsRicketti/generator-ducks
+
 [coveralls-image]: https://coveralls.io/repos/JulsRicketti/generator-ducks/badge.svg
+
 [coveralls-url]: https://coveralls.io/r/JulsRicketti/generator-ducks
+
